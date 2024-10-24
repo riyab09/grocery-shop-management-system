@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Sign Up - Elegant Shopping Experience</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .tabs {
+            display: flex;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .tab.active {
+            background-color: #ffffff;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #34495e;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #3498db;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .error {
+            color: #e74c3c;
+            margin-bottom: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('login')">Login</div>
+            <div class="tab" onclick="showTab('signup')">Sign Up</div>
+        </div>
+        <div class="tab-content">
+            <div id="error-message" class="error"></div>
+            <form id="login-form" method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" name="password" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+            <form id="signup-form" style="display: none;" method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" name="password" required>
+                </div>
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const forms = document.querySelectorAll('form');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            forms.forEach(form => form.style.display = 'none');
+
+            document.querySelector(`.tab:nth-child(${tabName === 'login' ? '1' : '2'})`).classList.add('active');
+            document.getElementById(`${tabName}-form`).style.display = 'block';
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            fetch("{% url 'login' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ action: 'login', email: email, password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect) {
+                    window.location.href = data.redirect; // Redirect to the specified page
+                } else {
+                    document.getElementById('error-message').textContent = data.error || 'An error occurred';
+                    document.getElementById('error-message').style.display = 'block';
+                }
+            });
+        });
+
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+
+            fetch("{% url 'login' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ action: 'signup', email: email, password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Sign up successful! You can now log in.');
+                    showTab('login'); // Switch to login tab after successful signup
+                } else {
+                    document.getElementById('error-message').textContent = data.error || 'An error occurred';
+                    document.getElementById('error-message').style.display = 'block';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

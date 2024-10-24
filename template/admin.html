@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        details {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        summary {
+            padding: 10px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        form {
+            max-width: 400px;
+            padding: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        #orders-list {
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Admin Page</h1>
+
+    <details>
+        <summary>1. Add Product</summary>
+        <form action="{% url 'admin_action' %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add">
+            <label for="add_name">Name:</label>
+            <input type="text" id="add_name" name="name" required>
+            
+            <label for="add_category">Category:</label>
+            <input type="text" id="add_category" name="category" required>
+            
+            <label for="add_price">Price:</label>
+            <input type="number" id="add_price" name="price" step="0.01" required>
+            
+            <label for="add_stock_quantity">Stock Quantity:</label>
+            <input type="number" id="add_stock_quantity" name="stock_quantity" required>
+            
+            <input type="submit" value="Add Product">
+        </form>
+    </details>
+
+    <details>
+        <summary>2. Update Product</summary>
+        <form action="{% url 'admin_action' %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update">
+            <label for="update_id">Product ID:</label>
+            <input type="text" id="update_id" name="id" required>
+            
+            <label for="update_price">New Price:</label>
+            <input type="number" id="update_price" name="price" step="0.01">
+            
+            <label for="update_stock">Update Stock:</label>
+            <input type="number" id="update_stock" name="updatestock" min="0">
+            
+            <input type="submit" value="Update Product">
+        </form>
+    </details>
+
+    <details>
+        <summary>3. Delete Product</summary>
+        <form action="{% url 'admin_action' %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="delete">  <!-- Specify delete action -->
+            
+            <label for="delete_id">Product ID:</label>
+            <input type="text" id="delete_id" name="id" required>
+            
+            <input type="submit" value="Delete Product" onclick="return confirm('Are you sure you want to delete this product?')">
+        </form>
+    </details>
+    
+
+    <details id="product-details" {% if request.GET.price_sort or request.GET.stock_sort or request.GET.search %}open{% endif %}>
+        <summary>4. View Products</summary>
+        <div id="products-list">
+            <div style="margin-bottom: 20px;">
+            <!-- 
+                    <label for="priceSort">Price:</label>
+                    <select name="price_sort" id="priceSort" onchange="this.form.submit()">
+                        <option value="">Sort by Price</option>
+                        <option value="asc" {% if request.GET.price_sort == 'asc' %}selected{% endif %}>Low to High</option>
+                        <option value="desc" {% if request.GET.price_sort == 'desc' %}selected{% endif %}>High to Low</option>
+                    </select>
+    
+                    <label for="stockSort">Stock:</label>
+                    <select name="stock_sort" id="stockSort" onchange="this.form.submit()">
+                        <option value="">Sort by Stock</option>
+                        <option value="asc" {% if request.GET.stock_sort == 'asc' %}selected{% endif %}>Low to High</option>
+                        <option value="desc" {% if request.GET.stock_sort == 'desc' %}selected{% endif %}>High to Low</option>
+                    </select>
+                </form>
+            </div>
+    --> 
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock Quantity</th>
+                    </tr>
+                </thead>
+                <tbody id="products-table-body">
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.category }}</td>
+                        <td>${{ product.price|floatformat:2 }}</td>
+                        <td>{{ product.stock_quantity }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center;">No products found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </details>
+    
+    <script>
+        // Ensure 'View Products' section stays open after form submission if filters are applied
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('price_sort') || urlParams.has('stock_sort') || urlParams.has('search')) {
+                document.getElementById('product-details').setAttribute('open', 'true');
+            }
+        });
+    </script>
+    
+    
+<!--
+    <details open>
+        <summary>5. View Orders</summary>
+    
+        <div id="orders-list">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>User ID</th>
+                        <th>Order Date</th>
+                        <th>Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-table-body">
+                    {% if orders %}
+                        {% for order in orders %}
+                            <tr>
+                                <td>{{ order.order_id }}</td>
+                                <td>{{ order.user_id }}</td>
+                                <td>{{ order.order_date }}</td>
+                                <td>${{ order.total_amount }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4">No orders found.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </details>
+-->     
+    <script>
+        // Optional: Add animation to the dropdown
+        const details = document.querySelectorAll('details');
+        details.forEach((detail) => {
+            detail.addEventListener('toggle', (e) => {
+                if (detail.open) {
+                    detail.style.animation = 'fadeIn 0.5s ease';
+                } else {
+                    detail.style.animation = 'fadeOut 0.5s ease';
+                }
+            });
+        });
+
+        // Function to fetch and display orders
+       
+        // Call fetchOrders when the "View Orders" section is opened
+        document.querySelector('details:nth-of-type(5)').addEventListener('toggle', function(e) {
+            if (this.open) {
+                fetchOrders();
+            }
+        });
+
+        // Sample product data (replace this with actual data from your server)
+        
+
+        function displayProducts(productsToShow) {
+            const tableBody = document.getElementById('products-table-body');
+            tableBody.innerHTML = '';  // Clear existing rows
+
+            productsToShow.forEach(product => {
+                const row = `
+                    <tr>
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>${product.category}</td>
+                        <td>$${product.price.toFixed(2)}</td>
+                        <td>${product.stock_quantity}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        function filterAndSortProducts() {
+            const searchTerm = document.getElementById('productSearch').value.toLowerCase();
+            const sortOrder = document.getElementById('priceSort').value;
+            const tableBody = document.getElementById('products-table-body');
+            const rows = Array.from(tableBody.getElementsByTagName('tr'));
+
+            rows.forEach(row => {
+                const name = row.cells[1].textContent.toLowerCase();
+                const category = row.cells[2].textContent.toLowerCase();
+                const match = name.includes(searchTerm) || category.includes(searchTerm);
+                row.style.display = match ? '' : 'none';
+            });
+
+            if (sortOrder) {
+                rows.sort((a, b) => {
+                    const priceA = parseFloat(a.cells[3].textContent.replace('$', ''));
+                    const priceB = parseFloat(b.cells[3].textContent.replace('$', ''));
+                    return sortOrder === 'asc' ? priceA - priceB : priceB - priceA;
+                });
+
+                rows.forEach(row => tableBody.appendChild(row));
+            }
+        }
+
+        // Initial display of products
+        displayProducts(products);
+
+        // Add event listeners for search and sort
+        document.getElementById('productSearch').addEventListener('input', filterAndSortProducts);
+        document.getElementById('priceSort').addEventListener('change', filterAndSortProducts);
+
+        // Fetch products when the section is opened
+        document.querySelector('details:nth-of-type(4)').addEventListener('toggle', function(e) {
+            if (this.open) {
+                // In a real application, you would fetch products from the server here
+                // For now, we're using the sample data
+                displayProducts(products);
+            }
+        });
+    </script>
+</body>
+</html>

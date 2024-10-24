@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elegant Shopping Experience</title>
+    <style>
+        /* ... existing styles from customer.html ... */
+
+        /* New styles for the combined layout */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .content-wrapper {
+            display: flex;
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            gap: 2rem;
+        }
+
+        .product-section {
+            flex: 1;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .search-bar {
+            display: flex;
+            max-width: 300px;
+        }
+
+        .search-bar input {
+            flex-grow: 1;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            font-size: 1rem;
+        }
+
+        .search-bar button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-radius: 0 4px 4px 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-bar button:hover {
+            background-color: #2980b9;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-card h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.2rem;
+        }
+
+        .product-card p {
+            margin: 0.5rem 0;
+            color: #7f8c8d;
+        }
+
+        .product-card .price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .product-card input[type="number"] {
+            width: 60px;
+            padding: 0.5rem;
+            margin-right: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .product-card button {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+
+        .product-card button:hover {
+            background-color: #27ae60;
+        }
+
+        .cart-section {
+            width: 350px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            align-self: flex-start;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .cart-item {
+            border-bottom: 1px solid #eee;
+            padding: 1rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item-details h4 {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .cart-item-details p {
+            margin: 0.25rem 0 0;
+            color: #7f8c8d;
+        }
+
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+        }
+
+        .cart-item-quantity button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .cart-item-quantity input {
+            width: 30px;
+            text-align: center;
+            margin: 0 0.25rem;
+        }
+
+        .cart-summary {
+            margin-top: 1rem;
+            border-top: 2px solid #eee;
+            padding-top: 1rem;
+        }
+
+        .checkout-btn {
+            background-color: #2ecc71;
+            color: #fff;
+            border: none;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 1024px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+
+            .product-section {
+                margin-right: 0;
+                margin-bottom: 2rem;
+            }
+
+            .cart-section {
+                width: 100%;
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Fresh Mart</h1>
+    </header>
+
+    <div class="content-wrapper">
+        <section class="product-section">
+            <div class="section-header">
+                <h2>Our Collection</h2>
+                <div class="search-bar">
+                    <input type="text" id="search-input" placeholder="Search for products...">
+                    <button id="search-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="product-grid" id="productGrid">
+                <!-- Product cards will be dynamically inserted here -->
+            </div>
+        </section>
+
+        <section class="cart-section">
+            <h2>Your Cart</h2>
+            <div id="cart-items">
+                <!-- Cart items will be dynamically inserted here -->
+            </div>
+            <div class="cart-summary">
+                <p>Subtotal: $<span id="subtotal">0.00</span></p>
+                <p>Tax (10%): $<span id="tax">0.00</span></p>
+                <p><strong>Total: $<span id="total">0.00</span></strong></p>
+                <button class="checkout-btn" onclick="checkout()">Order</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        let cart = [];
+    
+        // Function to add items to the cart
+        function addToCart(productId, quantity) {
+            const product = products.find(p => p.product_id === productId);
+            if (product) {
+                const existingItem = cart.find(item => item.id === productId);
+                if (existingItem) {
+                    existingItem.quantity += parseInt(quantity);
+                } else {
+                    cart.push({
+                        id: product.product_id,
+                        name: product.name,
+                        price: product.price,
+                        quantity: parseInt(quantity)
+                    });
+                }
+                renderCart();
+                alert(`Added ${quantity} ${product.name}(s) to your cart!`);
+            }
+        }
+    
+        // Function to create product cards
+        function createProductCard(product) {
+            return `
+                <div class="product-card">
+                    <h3>${product.name}</h3>
+                    <p>Category: ${product.category}</p>
+                    <p>Price: $${product.price.toFixed(2)}</p>
+                    <p>In Stock: ${product.stock_quantity}</p>
+                    <input type="number" min="1" max="${product.stock_quantity}" value="1" id="quantity-${product.product_id}">
+                    <button onclick="addToCart(${product.product_id}, document.getElementById('quantity-${product.product_id}').value)">Add to Cart</button>
+                </div>
+            `;
+        }
+    
+        // Function to render product grid
+        function renderProducts() {
+            const productGrid = document.getElementById('productGrid');
+            productGrid.innerHTML = products.map(createProductCard).join('');
+        }
+    
+        // Function to render cart
+        function renderCart() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            cartItemsContainer.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-details">
+                        <h4>${item.name}</h4>
+                        <p>Price: $${item.price.toFixed(2)}</p>
+                    </div>
+                    <div class="cart-item-quantity">
+                        <button onclick="removeFromCart(${item.id})">-</button>
+                        <input type="number" value="${item.quantity}" min="1" onchange="updateCart(${item.id}, this.value)">
+                        <button onclick="addToCart(${item.id}, 1)">+</button>
+                    </div>
+                </div>
+            `).join('');
+            updateCartSummary();
+        }
+    
+        // Function to update cart summary
+        function updateCartSummary() {
+            const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+            const tax = subtotal * 0.10;
+            const total = subtotal + tax;
+    
+            document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+            document.getElementById('tax').textContent = tax.toFixed(2);
+            document.getElementById('total').textContent = total.toFixed(2);
+        }
+    
+        // Function to update item quantity in cart
+        function updateCart(id, quantity) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                item.quantity = parseInt(quantity);
+                renderCart();
+            }
+        }
+    
+        // Function to remove item from cart
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            renderCart();
+        }
+    
+        function checkout() {
+    if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+    }
+
+    // Prepare cart data as product_id,quantity pairs
+    const cartDetails = cart.map(item => `${item.id},${item.quantity}`).join(';');
+
+    fetch('/place-order/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: `cart=${cartDetails}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.success);
+            cart = [];  // Clear the cart
+            renderCart();  // Re-render the empty cart
+            updateCartSummary();  // Reset totals
+            location.reload();
+        } else {
+            alert(data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("An error occurred. Please try again.");
+    });
+}
+// Utility function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+        // Function to search products
+        document.getElementById('search-button').onclick = function () {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const filteredProducts = products.filter(product => product.name.toLowerCase().includes(query));
+            const productGrid = document.getElementById('productGrid');
+            productGrid.innerHTML = filteredProducts.map(createProductCard).join('');
+        };
+    
+        // Use the products variable passed from Django
+        const products = {{ products|safe }}; // Use safe to prevent escaping
+        renderProducts(); // Render products on page load
+    </script>    
+</body>
+</html>
